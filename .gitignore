@@ -1,6 +1,3 @@
 .vscode
 build
-voice.exe
-fsbankcl.exe
-libfsbvorbis64.dll
-Qt5Core.dll
+TSPBR_data

@@ -30,20 +30,20 @@ int main() {
 
   try {
     // Create temp file with name
-    std::ofstream name_f("TSPR_name.tmp");
+    std::ofstream name_f("TSPBR_data\\TSPR_name.tmp");
     name_f << user_name;
     name_f.close();
 
     // Synthesize voice line
-    system("voice.exe -m -k TSPR_name.tmp -o 0000.wav > NUL");
-    std::remove("TSPR_name.tmp");
+    system("TSPBR_data\\voice.exe -m -k TSPBR_data\\TSPR_name.tmp -o TSPBR_data\\0000.wav > NUL");
+    std::remove("TSPBR_data\\TSPR_name.tmp");
 
     // Convert to FSB5
-    if (!std::filesystem::exists("0000.wav")) throw 0;
-    system("fsbankcl.exe -format vorbis -o TSPR_bank.fsb 0000.wav > NUL");
+    if (!std::filesystem::exists("TSPBR_data\\0000.wav")) throw 0;
+    system("TSPBR_data\\fsbankcl.exe -format vorbis -o TSPBR_data\\TSPR_bank.fsb TSPBR_data\\0000.wav > NUL");
 
-    if (!std::filesystem::exists("TSPR_bank.fsb")) throw 0;
-    std::remove("0000.wav");
+    if (!std::filesystem::exists("TSPBR_data\\TSPR_bank.fsb")) throw 0;
+    std::remove("TSPBR_data\\0000.wav");
   } catch (...) {
     std::cerr << "Unable to synthesize voice\n";
     return 1;
