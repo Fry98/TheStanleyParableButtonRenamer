@@ -1,4 +1,4 @@
-#define UNICODE
+#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 
 #include <windows.h>
 #include <iostream>
@@ -12,8 +12,20 @@
 #include <filesystem>
 #include "lib/vdf_parser.h"
 
+#define run_command(cmd) CreateProcess( \
+    NULL, cmd, NULL, NULL, FALSE, \
+    NORMAL_PRIORITY_CLASS | CREATE_NO_WINDOW, \
+    NULL, NULL, &si, &pi \
+  ); \
+  WaitForSingleObject(pi.hProcess, INFINITE);
+
 int main() {
+  STARTUPINFO si;
+  PROCESS_INFORMATION pi;
   std::string user_name;
+
+  ZeroMemory(&si, sizeof(si));
+  ZeroMemory(&pi, sizeof(pi));
 
   // Get Steam profile name
   try {
@@ -29,7 +41,6 @@ int main() {
     if (user_name.length() < 1) throw 0;
     lu_if.close();
   } catch (...) {
-    std::cerr << "Unable to read Steam profile name\n";
     return 1;
   }
 
@@ -40,17 +51,16 @@ int main() {
     name_of.close();
 
     // Synthesize voice line
-    system("TSPBR_data\\voice.exe -v 60 -k TSPBR_data\\TSPR_name.tmp -o TSPBR_data\\0000.wav > NUL");
+    run_command("TSPBR_data\\voice.exe -v 75 -k TSPBR_data\\TSPR_name.tmp -o TSPBR_data\\0000.wav");
     std::remove("TSPBR_data\\TSPR_name.tmp");
 
     // Convert to FSB5
     if (!std::filesystem::exists("TSPBR_data\\0000.wav")) throw 0;
-    system("TSPBR_data\\fsbankcl.exe -format vorbis -o TSPBR_data\\TSPBR_bank.fsb TSPBR_data\\0000.wav > NUL");
+    run_command("TSPBR_data\\fsbankcl.exe -format vorbis -o TSPBR_data\\TSPBR_bank.fsb TSPBR_data\\0000.wav");
 
     if (!std::filesystem::exists("TSPBR_data\\TSPBR_bank.fsb")) throw 0;
     std::remove("TSPBR_data\\0000.wav");
   } catch (...) {
-    std::cerr << "Unable to synthesize voice\n";
     return 1;
   }
 
@@ -59,7 +69,7 @@ int main() {
   try {
     std::ifstream bank_if("TSPBR_data\\TSPBR_bank.fsb", std::ifstream::binary);
     std::ofstream rsrc_of(
-      "The Stanley Parable Ultra Deluxe_Data\\sharedassets21.resource",
+      "DATA\\sharedassets21.resource",
       std::ios::binary | std::ios::in | std::ios::out | std::ios::ate
     );
 
@@ -74,14 +84,13 @@ int main() {
     rsrc_of.close();
     std::remove("TSPBR_data\\TSPBR_bank.fsb");
   } catch (...) {
-    std::cerr << "Unable to modify .resource file\n";
     return 1;
   }
 
   try {
     // Find Jim button entry
     std::ifstream assets_if(
-      "The Stanley Parable Ultra Deluxe_Data\\sharedassets21.assets",
+      "DATA\\sharedassets21.assets",
       std::ifstream::binary
     );
 
@@ -97,7 +106,7 @@ int main() {
 
     // Update size and offset
     std::ofstream assets_of(
-      "The Stanley Parable Ultra Deluxe_Data\\sharedassets21.assets",
+      "DATA\\sharedassets21.assets",
       std::ios::binary | std::ios::in | std::ios::out
     );
 
@@ -106,10 +115,13 @@ int main() {
     assets_of.write(reinterpret_cast<char*>(&bank_size), 8);
     assets_of.close();
 
-    return 0;
+    CreateProcess(
+      "TSPUD.exe",
+      NULL, NULL, NULL,
+      NULL, NULL, NULL, NULL,
+      &si, &pi
+    );
   } catch (...) {
-    throw;
-    std::cerr << "Unable to modify .assets file\n";
     return 1;
   }
 }
