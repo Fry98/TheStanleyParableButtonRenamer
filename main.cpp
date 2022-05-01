@@ -7,7 +7,9 @@
 #include <string>
 #include <limits>
 #include <filesystem>
-#include "lib/vdf_parser.h"
+
+#include "lib/vdf_parser.hpp"
+#include "lib/json.hpp"
 
 #define run_cmd(cmd) CreateProcess( \
     NULL, cmd, NULL, NULL, FALSE, \
@@ -15,6 +17,15 @@
     NULL, NULL, &si, &pi \
   ); \
   WaitForSingleObject(pi.hProcess, INFINITE);
+
+#define start_game() CreateProcess( \
+    "TSPUD_Bootstrap", \
+    NULL, NULL, NULL, \
+    NULL, NULL, NULL, NULL, \
+    &si, &pi \
+  );
+
+using json = nlohmann::json;
 
 int main() {
   STARTUPINFO si;
@@ -50,28 +61,52 @@ int main() {
   }
 
   try {
-    // Get Steam profile name
+    // Load config file
+    std::ifstream conf_is("config.json");
+    if (conf_is.fail()) throw std::exception("Unable to load config.json");
+
+    std::string steam_install;
     try {
-      std::ifstream lu_if("C:\\Program Files (x86)\\Steam\\config\\loginusers.vdf");
-      if (lu_if.fail()) throw 0;
-
-      auto root = tyti::vdf::read(lu_if);
-      if (root.name != "users") throw 0;
-
-      auto it = root.childs.begin();
-      if (it == root.childs.end()) throw 0;
-
-      auto& user_data = *it->second;
-      user_name = user_data.attribs["PersonaName"];
-      if (user_name.length() < 1) throw 0;
-      lu_if.close();
+      auto& conf = json::parse(conf_is, nullptr, true, true);
+      steam_install = conf["steam_install"].get<std::string>();
+      user_name = conf["force_name"].get<std::string>();
+      conf_is.close();
     } catch (...) {
-      throw std::exception("Unable to read Steam profile name");
+      throw std::exception("Unable to parse config.json");
+    }
+
+    // Get Steam profile name
+    if (user_name.length() < 1) {
+      try {
+        std::ifstream lu_if;
+        if (steam_install.length() < 1) {
+          lu_if.open("..\\..\\..\\config\\loginusers.vdf");
+        } else {
+          std::filesystem::path steam_base(steam_install);
+          lu_if.open(steam_base / "config\\loginusers.vdf");
+        }
+        if (lu_if.fail()) throw 0;
+
+        auto root = tyti::vdf::read(lu_if);
+        if (root.name != "users") throw 0;
+
+        auto it = root.childs.begin();
+        if (it == root.childs.end()) throw 0;
+
+        auto& user_data = *it->second;
+        user_name = user_data.attribs["PersonaName"];
+        if (user_name.length() < 1) throw 0;
+        lu_if.close();
+      } catch (...) {
+        throw std::exception("Unable to read Steam profile name");
+      }
     }
 
     // Early exit
-    if (old_size > -1 && user_name == old_name)
-      goto start_game;
+    if (old_size > -1 && user_name == old_name) {
+      start_game();
+      return 0;
+    }
 
     try {
       // Create temp file with name
@@ -159,13 +194,8 @@ int main() {
     }
   } catch (std::exception& e) {
     MessageBox(NULL, e.what(), "TSPBR Error", MB_ICONERROR | MB_OK);
+    return 1;
   }
 
-start_game:
-  CreateProcess(
-    "TSPUD_Bootstrap",
-    NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL,
-    &si, &pi
-  );
+  start_game();
 }
