@@ -3,12 +3,9 @@
 #include <windows.h>
 #include <iostream>
 #include <fstream>
-#include <chrono>
 #include <algorithm>
 #include <string>
 #include <limits>
-#include <cstdio>
-#include <assert.h>
 #include <filesystem>
 #include "lib/vdf_parser.h"
 
@@ -29,6 +26,16 @@ int main() {
 
   ZeroMemory(&si, sizeof(si));
   ZeroMemory(&pi, sizeof(pi));
+
+  // Rename game data folder
+  if (!std::filesystem::exists("DATA")) {
+    try {
+      std::filesystem::rename("The Stanley Parable Ultra Deluxe_Data", "DATA");
+    } catch (...) {
+      MessageBox(NULL, "Unable to access game data folder", "TSPBR Error", MB_ICONERROR | MB_OK);
+      return 1;
+    }
+  }
 
   // Load mdat file
   std::ifstream mdat_is("TSPBR_data\\mdat");
@@ -156,7 +163,7 @@ int main() {
 
 start_game:
   CreateProcess(
-    "TSPUD.exe",
+    "TSPUD_Original",
     NULL, NULL, NULL,
     NULL, NULL, NULL, NULL,
     &si, &pi
