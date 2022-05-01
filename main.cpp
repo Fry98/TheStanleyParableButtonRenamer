@@ -1,24 +1,25 @@
 #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 
 #include <windows.h>
-#include <iostream>
 #include <fstream>
-#include <algorithm>
 #include <string>
 #include <limits>
+#include <algorithm>
 #include <filesystem>
 
 #include "lib/vdf_parser.hpp"
 #include "lib/json.hpp"
 
-#define run_cmd(cmd) CreateProcess( \
+#define run_cmd(cmd) \
+  CreateProcess( \
     NULL, cmd, NULL, NULL, FALSE, \
     NORMAL_PRIORITY_CLASS | CREATE_NO_WINDOW, \
     NULL, NULL, &si, &pi \
   ); \
   WaitForSingleObject(pi.hProcess, INFINITE);
 
-#define start_game() CreateProcess( \
+#define start_game() \
+  CreateProcess( \
     "TSPUD_Bootstrap", \
     NULL, NULL, NULL, \
     NULL, NULL, NULL, NULL, \
@@ -62,8 +63,8 @@ int main() {
 
   try {
     // Load config file
-    std::ifstream conf_is("config.json");
-    if (conf_is.fail()) throw std::exception("Unable to load config.json");
+    std::ifstream conf_is("config_TSPBR.json");
+    if (conf_is.fail()) throw std::exception("Unable to load config_TSPBR.json");
 
     std::string steam_install;
     try {
@@ -72,7 +73,7 @@ int main() {
       user_name = conf["force_name"].get<std::string>();
       conf_is.close();
     } catch (...) {
-      throw std::exception("Unable to parse config.json");
+      throw std::exception("Unable to parse config_TSPBR.json");
     }
 
     // Get Steam profile name
@@ -106,6 +107,21 @@ int main() {
     if (old_size > -1 && user_name == old_name) {
       start_game();
       return 0;
+    }
+
+    // Create backups
+    if (!std::filesystem::exists("DATA\\sharedassets21.resource.bak")) {
+      std::filesystem::copy_file(
+        "DATA\\sharedassets21.resource",
+        "DATA\\sharedassets21.resource.bak"
+      );
+    }
+
+    if (!std::filesystem::exists("DATA\\sharedassets21.assets.bak")) {
+      std::filesystem::copy_file(
+        "DATA\\sharedassets21.assets",
+        "DATA\\sharedassets21.assets.bak"
+      );
     }
 
     try {

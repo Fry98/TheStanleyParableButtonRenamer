@@ -7,3 +7,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_executable(${PROJECT_NAME} main.cpp app.rc)
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "The Stanley Parable Ultra Deluxe")
+
+add_executable(${PROJECT_NAME}_UNINST uninstall.cpp)
+set_target_properties(${PROJECT_NAME}_UNINST PROPERTIES OUTPUT_NAME "uninstall_TSPBR")
