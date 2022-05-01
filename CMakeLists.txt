@@ -5,4 +5,5 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_executable(${PROJECT_NAME} main.cpp)
+add_executable(${PROJECT_NAME} main.cpp app.rc)
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "The Stanley Parable Ultra Deluxe")

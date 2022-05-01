@@ -126,7 +126,7 @@ int main() {
       if (assets_if.fail()) throw 0;
 
       std::string trg_str("ud_ncp2_jim_button");
-      std::search(
+      std::ignore = std::search(
         std::istreambuf_iterator<char>(assets_if),
         std::istreambuf_iterator<char>(),
         trg_str.begin(), trg_str.end()
@@ -163,7 +163,7 @@ int main() {
 
 start_game:
   CreateProcess(
-    "TSPUD_Original",
+    "TSPUD_Bootstrap",
     NULL, NULL, NULL,
     NULL, NULL, NULL, NULL,
     &si, &pi
