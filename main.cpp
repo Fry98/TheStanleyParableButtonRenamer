@@ -22,7 +22,7 @@ int main() {
   std::string user_name;
 
   char old_name[48] = {};
-  size_t old_size = SIZE_MAX;
+  int64_t old_size = -1;
 
   ZeroMemory(&si, sizeof(si));
   ZeroMemory(&pi, sizeof(pi));
@@ -70,7 +70,7 @@ int main() {
     }
 
     // Early exit
-    if (old_size < SIZE_MAX && user_name == old_name)
+    if (old_size > -1 && user_name == old_name)
       goto start_game;
 
     try {
@@ -104,7 +104,7 @@ int main() {
         std::ios::binary | std::ios::in | std::ios::out | std::ios::ate
       );
 
-      if (old_size < SIZE_MAX) rsrc_of.seekp(-old_size, std::ios_base::end);
+      if (old_size > -1) rsrc_of.seekp(-old_size, std::ios_base::end);
       bank_off = rsrc_of.tellp();
 
       while (!bank_if.eof()) {
