@@ -188,7 +188,6 @@ int main() {
       size_t jb_off = assets_if.tellg();
       assets_if.close();
 
-      // Update size and offset
       std::ofstream assets_of(
         "DATA\\sharedassets21.assets",
         std::ios::binary | std::ios::in | std::ios::out
