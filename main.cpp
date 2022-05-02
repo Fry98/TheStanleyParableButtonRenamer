@@ -1,5 +1,3 @@
-#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
-
 #include <windows.h>
 #include <fstream>
 #include <string>
@@ -47,7 +45,7 @@ int main() {
     }
   }
 
-  // Load mdat file
+  // Load mdat.bin file
   std::ifstream mdat_is("TSPBR_data\\mdat.bin");
   if (!mdat_is.fail()) {
     mdat_is.read(reinterpret_cast<char*>(&old_size), 8);
@@ -186,6 +184,7 @@ int main() {
         trg_str.begin(), trg_str.end()
       );
 
+      // Update size and offset
       size_t jb_off = assets_if.tellg();
       assets_if.close();
 
