@@ -50,7 +50,7 @@ int main() {
   }
 
   // Load mdat file
-  std::ifstream mdat_is("TSPBR_data\\mdat");
+  std::ifstream mdat_is("TSPBR_data\\mdat.bin");
   if (!mdat_is.fail()) {
     mdat_is.read(reinterpret_cast<char*>(&old_size), 8);
 
@@ -63,8 +63,8 @@ int main() {
 
   try {
     // Load config file
-    std::ifstream conf_is("config_TSPBR.json");
-    if (conf_is.fail()) throw std::exception("Unable to load config_TSPBR.json");
+    std::ifstream conf_is("TSPBR_config.json");
+    if (conf_is.fail()) throw std::exception("Unable to load TSPBR_config.json");
 
     std::string steam_install;
     try {
@@ -73,7 +73,7 @@ int main() {
       user_name = conf["force_name"].get<std::string>();
       conf_is.close();
     } catch (...) {
-      throw std::exception("Unable to parse config_TSPBR.json");
+      throw std::exception("Unable to parse TSPBR_config.json");
     }
 
     // Get Steam profile name
@@ -126,13 +126,13 @@ int main() {
 
     try {
       // Create temp file with name
-      std::ofstream name_of("TSPBR_data\\TSPR_name.tmp");
+      std::ofstream name_of("TSPBR_data\\TSPBR_name.tmp");
       name_of << user_name;
       name_of.close();
 
       // Synthesize voice line
-      run_cmd("TSPBR_data\\voice.exe -v 75 -k TSPBR_data\\TSPR_name.tmp -o TSPBR_data\\0000.wav");
-      std::remove("TSPBR_data\\TSPR_name.tmp");
+      run_cmd("TSPBR_data\\voice.exe -v 75 -k TSPBR_data\\TSPBR_name.tmp -o TSPBR_data\\0000.wav");
+      std::remove("TSPBR_data\\TSPBR_name.tmp");
 
       // Convert to FSB5
       if (!std::filesystem::exists("TSPBR_data\\0000.wav")) throw 0;
@@ -201,12 +201,12 @@ int main() {
     }
 
     try {
-      std::ofstream mdat_os("TSPBR_data\\mdat");
+      std::ofstream mdat_os("TSPBR_data\\mdat.bin");
       mdat_os.write(reinterpret_cast<char*>(&bank_size), 8);
       mdat_os << user_name;
       mdat_os.close();
     } catch (...) {
-      throw std::exception("Unable to write into mdat");
+      throw std::exception("Unable to write into mdat.bin");
     }
   } catch (std::exception& e) {
     MessageBox(NULL, e.what(), "TSPBR Error", MB_ICONERROR | MB_OK);

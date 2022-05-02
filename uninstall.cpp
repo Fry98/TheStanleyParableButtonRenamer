@@ -5,7 +5,7 @@
 #include <filesystem>
 #include <iostream>
 
-#define SELF_REMOVE_STRING  TEXT("cmd.exe /C ping 1.1.1.1 -n 1 -w 3000 > Nul & Del /f /q \"%s\"")
+#define SELF_REMOVE_STRING TEXT("cmd.exe /C ping 1.1.1.1 -n 1 -w 3000 > Nul & Del /f /q \"%s\"")
 
 void delete_self() {
   TCHAR szModuleName[MAX_PATH];
@@ -35,7 +35,7 @@ void delete_self() {
   } catch (...) {}
 
 int main() {
-  try_remove("config_TSPBR.json");
+  try_remove("TSPBR_config.json");
   try_remove("The Stanley Parable Ultra Deluxe.exe");
 
   restore_backup("sharedassets21.assets");
@@ -47,6 +47,10 @@ int main() {
 
   try {
     std::filesystem::rename("TSPUD_Bootstrap", "The Stanley Parable Ultra Deluxe.exe");
+  } catch (...) {}
+
+  try {
+    std::filesystem::rename("DATA", "The Stanley Parable Ultra Deluxe_Data");
   } catch (...) {}
 
   delete_self();
