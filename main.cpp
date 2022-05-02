@@ -26,8 +26,6 @@
     &si, &pi \
   );
 
-using json = nlohmann::json;
-
 int main() {
   STARTUPINFO si;
   PROCESS_INFORMATION pi;
@@ -68,9 +66,14 @@ int main() {
 
     std::string steam_install;
     try {
-      auto& conf = json::parse(conf_is, nullptr, true, true);
-      steam_install = conf["steam_install"].get<std::string>();
-      user_name = conf["force_name"].get<std::string>();
+      auto& conf = nlohmann::json::parse(conf_is, nullptr, true, true);
+
+      if (conf["steam_install"].is_string())
+        steam_install = conf["steam_install"].get<std::string>();
+
+      if (conf["force_name"].is_string())
+        user_name = conf["force_name"].get<std::string>();
+
       conf_is.close();
     } catch (...) {
       throw std::exception("Unable to parse TSPBR_config.json");
