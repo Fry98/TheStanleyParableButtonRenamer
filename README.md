@@ -1,6 +1,8 @@
 # The Stanley Parable Button Renamer
 This is a mod for **The Stanley Parable: Ultra Deluxe** which modifies the "Jim" button such that it actually says your name.
 
+**Demo:** https://youtu.be/dHq9_lhJI8I
+
 ## Installation
 Download the latest version of the mod from Releases and extract all the files from the zip archive into the installation directory of **The Stanley Parable: Ultra Deluxe**, overwriting the file `The Stanley Parable Ultra Deluxe.exe`.
 
