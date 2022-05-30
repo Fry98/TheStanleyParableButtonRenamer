@@ -104,6 +104,9 @@ int main() {
       }
     }
 
+    if (user_name.size() > 32)
+      throw std::exception("Username cannot exceed 32 characters");
+
     // Early exit
     if (old_size > -1 && user_name == old_name) {
       start_game();

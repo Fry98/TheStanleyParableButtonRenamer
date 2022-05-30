@@ -11,7 +11,7 @@
 #define restore_backup(file) \
   try { \
     if (std::filesystem::exists("DATA\\" file ".bak")) { \
-      IGNORE_ALL(std::remove("DATA\\" file)) \
+      std::remove("DATA\\" file); \
       std::filesystem::rename("DATA\\" file ".bak", "DATA\\" file); \
     } \
   } catch (...) {}
